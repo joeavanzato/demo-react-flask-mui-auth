@@ -1,13 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from pymongo import MongoClient
 from flask_restful import Resource, Api
 from bson.json_util import dumps
 from passlib.hash import sha256_crypt
 from flask_jwt_extended import create_access_token,create_refresh_token,get_jwt,get_jwt_identity, jwt_required, JWTManager
 import datetime
-import time
+
 # py -m flask  --app app --debug run
 
+# PyMongo DB/Collection Variable Setup
 client = MongoClient()
 db = client.example_db
 demo_collection = db.demo_collection
@@ -15,6 +16,14 @@ user_collection = db.user_collection
 token_collection = db.token_collection
 
 app = Flask(__name__, template_folder='templates')
+app.config['JWT_SECRET_KEY'] = 'jwt-secret-string-example'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=240)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
+app.config["INITIAL_USERNAME"] = "user@test.com"
+app.config["INITIAL_PASSWORD"] = sha256_crypt.encrypt("initial_password")
+
+api = Api(app)
+jwt = JWTManager(app)
 
 # For helping with Same-Origin requests from the React App
 @app.after_request
@@ -24,26 +33,18 @@ def after_request(response):
   response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
   return response
 
-api = Api(app)
-
-jwt = JWTManager(app)
-app.config['JWT_SECRET_KEY'] = 'jwt-secret-string-example'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=240)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
 
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload: dict):
     jti = jwt_payload['jti']
     return is_jti_blacklisted(jti)
 
+
 def is_jti_blacklisted(jti):
     if db.token_collection.count_documents({"jti": jti}) != 0:
         return True
     else:
         return False
-
-app.config["INITIAL_USERNAME"] = "user@test.com"
-app.config["INITIAL_PASSWORD"] = sha256_crypt.encrypt("initial_password")
 
 # Create the Initial User specified in the configuration data
 def create_initial_user():
@@ -57,6 +58,7 @@ def create_initial_user():
         user_collection.update_one(temp_dict, {'$set':temp_dict}, upsert=True)
 create_initial_user()
 
+
 # Verify the initial user was created and password functionality is working as expected
 def verify_initial_user():
     temp_doc = user_collection.find_one({'email': app.config["INITIAL_USERNAME"]}, {})
@@ -64,20 +66,13 @@ def verify_initial_user():
         print("[*] Successfully Verified Initial User")
 verify_initial_user()
 
-
 # REST API Specifications for retrieving and setting scan configurations
-class Scan(Resource):
+class Demo(Resource):
     @jwt_required()
     def get(self):
-        time.sleep(1)
         scans = demo_collection.aggregate([{"$project": {'id': '$_id', 'name': 1, 'category': 1, 'test_object': 1, '_id': 0}}, ])
         return dumps(scans)
-
-    @jwt_required()
-    def post(self):
-        data = request.get_json()
-        return jsonify({'data': data}), 201
-api.add_resource(Scan, '/api/demo')
+api.add_resource(Demo, '/api/demo')
 
 # REST API Specifications for creating JSON Web Tokens (JWTs)
 class Login(Resource):
@@ -147,7 +142,6 @@ class Add_User(Resource):
     @jwt_required()
     def post(self):
         pass
-
 
 class RevokedToken:
     def __init__(self, ident, jti):
