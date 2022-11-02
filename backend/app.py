@@ -5,6 +5,7 @@ from bson.json_util import dumps
 from passlib.hash import sha256_crypt
 from flask_jwt_extended import create_access_token,create_refresh_token,get_jwt,get_jwt_identity, jwt_required, JWTManager
 import datetime
+import time
 
 # py -m flask  --app app --debug run
 
@@ -16,14 +17,6 @@ user_collection = db.user_collection
 token_collection = db.token_collection
 
 app = Flask(__name__, template_folder='templates')
-app.config['JWT_SECRET_KEY'] = 'jwt-secret-string-example'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=240)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
-app.config["INITIAL_USERNAME"] = "user@test.com"
-app.config["INITIAL_PASSWORD"] = sha256_crypt.encrypt("initial_password")
-
-api = Api(app)
-jwt = JWTManager(app)
 
 # For helping with Same-Origin requests from the React App
 @app.after_request
@@ -32,6 +25,17 @@ def after_request(response):
   response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
   response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
   return response
+
+
+app.config['JWT_SECRET_KEY'] = 'jwt-secret-string-example'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=240)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
+app.config["INITIAL_USERNAME"] = "admin@admin.com"
+app.config["INITIAL_PASSWORD"] = sha256_crypt.encrypt("change_me")
+
+api = Api(app)
+jwt = JWTManager(app)
+
 
 
 @jwt.token_in_blocklist_loader
@@ -72,7 +76,7 @@ class Demo(Resource):
     def get(self):
         scans = demo_collection.aggregate([{"$project": {'id': '$_id', 'name': 1, 'category': 1, 'test_object': 1, '_id': 0}}, ])
         return dumps(scans)
-api.add_resource(Demo, '/api/demo')
+api.add_resource(Demo, '/api/demos')
 
 # REST API Specifications for creating JSON Web Tokens (JWTs)
 class Login(Resource):
@@ -98,7 +102,8 @@ api.add_resource(Login, '/api/login')
 # Revoke an Active Token via adding to Block List
 class Logout(Resource):
     @jwt_required()
-    def post(self):
+    def get(self):
+        time.sleep(1)
         jti_data = get_jwt()
         id = get_jwt_identity()
         jti = jti_data['jti']
@@ -138,10 +143,6 @@ class ValidateToken(Resource):
             return {'msg': 'Invalid JWT'}
 api.add_resource(ValidateToken, '/api/validate')
 
-class Add_User(Resource):
-    @jwt_required()
-    def post(self):
-        pass
 
 class RevokedToken:
     def __init__(self, ident, jti):
