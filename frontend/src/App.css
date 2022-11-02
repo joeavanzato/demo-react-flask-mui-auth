@@ -1,0 +1,95 @@
+.Background {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 100%;
+  width: 100%;
+  background: rgb(101,133,159);
+  background: linear-gradient(180deg, rgba(101,133,159,1) 0%, rgba(12,50,81,1) 100%);
+
+}
+
+.navbar {
+  padding-left: 5px;
+}
+
+.demos_container {
+  margin: auto;
+  margin-top: 20px;
+  display: block;
+  align-self: center;
+  width: 95%;
+  height: 90%;
+  background: #231629;
+  background: linear-gradient(90deg, rgba(61,2,46,1) 0%, rgba(86,0,120,1) 100%);
+  border-radius: 8px;
+  padding: 10px;
+  color: #BEBCC2;
+  color: white;
+}
+
+.centered_loading_div {
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+
+
+
+/* Logout Area */
+
+.Logout {
+  margin: auto;
+  margin-top: 20px;
+  display: block;
+  align-self: center;
+  width: 95%;
+  height: 90%;
+  background: #231629;
+  background: linear-gradient(90deg, rgba(61,2,46,1) 0%, rgba(86,0,120,1) 100%);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+
+/* Login Form Start */
+.login_spinner {
+  align-content: center;
+  margin-left: 50%;
+}
+.Auth-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 300px;
+  margin: 10%;
+}
+.Auth-form {
+  width: 420px;
+  box-shadow: rgb(0 0 0 / 16%) 10px 10px 10px;
+  padding-top: 30px;
+  padding-bottom: 20px;
+  border-radius: 8px;
+  background-color: #EE9E7C;
+}
+.Auth-form-content {
+  padding-left: 12%;
+  padding-right: 12%;
+}
+.Auth-form-title {
+  text-align: center;
+  margin-bottom: 1em;
+  font-size: 24px;
+  color: rgb(34, 34, 34);
+  font-weight: 800;
+}
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(34, 34, 34);
+}
+/* Login Form End */
