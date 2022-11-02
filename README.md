@@ -6,6 +6,8 @@ I also utilize react-spring for some animations, react-router for pathing/naviga
 
 I am by no means an expert in these technologies - in learning, I found there was many different implementation techniques for both Flask and React when considering how to protect resources - I wanted to demonstrate one methodology I found particularly easy to implement while also providing a decent authentication mechanism for users.  Keep in mind I am not paying any mind to 'authorization' in this demo and am considering all users to have the same level of permissions in both the front-end and back-end implementations.
 
+![Demonstration](img/apptest.gif?raw=true "Demonstration")
+
 ### To Start / Requirements
 Ensure MongoDB is installed / running (or modify to use an Atlas instance,etc). (https://www.mongodb.com/try/download/community)
 

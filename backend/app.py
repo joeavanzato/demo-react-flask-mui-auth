@@ -74,6 +74,7 @@ verify_initial_user()
 class Demo(Resource):
     @jwt_required()
     def get(self):
+        time.sleep(1)
         scans = demo_collection.aggregate([{"$project": {'id': '$_id', 'name': 1, 'category': 1, 'test_object': 1, '_id': 0}}, ])
         return dumps(scans)
 api.add_resource(Demo, '/api/demos')
